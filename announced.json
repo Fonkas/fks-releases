@@ -1,5 +1,8 @@
 {
   "fks-animations": [],
+  "fks-chat": [
+    "v1.0.0"
+  ],
   "fks-deadmoon": [
     "v0.9.0"
   ],
