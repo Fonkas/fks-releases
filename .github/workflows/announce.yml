@@ -36,7 +36,7 @@ jobs:
   announce:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Announce new releases
         env:
@@ -55,10 +55,11 @@ jobs:
 
       - name: Save announced releases
         run: |
-          if [ -n "$(git status --porcelain announced.json)" ]; then
+          git add announced.json
+          # nothing really changed (e.g. a release announced again by hand): no commit
+          if ! git diff --cached --quiet; then
             git config user.name 'github-actions[bot]'
             git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-            git add announced.json
             git commit -m 'Update announced releases'
             git push
           fi
