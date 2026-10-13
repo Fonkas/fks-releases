@@ -1,0 +1,64 @@
+# Announces on Discord every new GitHub Release of the owner's repositories (one place for all the scripts).
+# Runs every 15 minutes, finds releases that were not announced yet (announced.json) and posts them.
+#
+# Repository secrets (Settings > Secrets and variables > Actions):
+#   DISCORD_RELEASE_WEBHOOK  - webhook URL of the changelog channel (simplest option)
+#   or, to post with your bot account (and auto-publish in an Announcement channel):
+#   DISCORD_BOT_TOKEN        - your bot token
+#   DISCORD_CHANNEL_ID       - the changelog channel ID
+#
+# Optional repository variables (Settings > Secrets and variables > Actions > Variables):
+#   REPO_PREFIX      - only repositories whose name starts with this (default: fks-)
+#   DISCORD_NAME     - name shown on webhook messages (default: FK Changelog)
+#   DISCORD_AVATAR   - avatar image URL for webhook messages
+#   DISCORD_COLOR    - embed color in hex (default: F2C14E, gold)
+
+name: Discord release announcements
+
+on:
+  schedule:
+    - cron: '*/15 * * * *'
+  workflow_dispatch:
+    inputs:
+      repo:
+        description: 'Announce the latest release of this repository now (e.g. fks-stables). Empty = normal check.'
+        required: false
+        default: ''
+
+permissions:
+  contents: write # saves announced.json
+
+concurrency:
+  group: announce
+  cancel-in-progress: false
+
+jobs:
+  announce:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Announce new releases
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          OWNER: ${{ github.repository_owner }}
+          SELF: ${{ github.event.repository.name }}
+          FORCE_REPO: ${{ github.event.inputs.repo }}
+          WEBHOOK: ${{ secrets.DISCORD_RELEASE_WEBHOOK }}
+          BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
+          CHANNEL_ID: ${{ secrets.DISCORD_CHANNEL_ID }}
+          REPO_PREFIX: ${{ vars.REPO_PREFIX }}
+          NAME: ${{ vars.DISCORD_NAME }}
+          AVATAR: ${{ vars.DISCORD_AVATAR }}
+          COLOR: ${{ vars.DISCORD_COLOR }}
+        run: python3 announce.py
+
+      - name: Save announced releases
+        run: |
+          if [ -n "$(git status --porcelain announced.json)" ]; then
+            git config user.name 'github-actions[bot]'
+            git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+            git add announced.json
+            git commit -m 'Update announced releases'
+            git push
+          fi
