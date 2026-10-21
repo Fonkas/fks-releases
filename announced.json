@@ -1,5 +1,8 @@
 {
   "fks-animations": [],
+  "fks-character": [
+    "v.1.0.0"
+  ],
   "fks-chat": [
     "v1.0.0"
   ],
