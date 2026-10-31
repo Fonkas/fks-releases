@@ -32,6 +32,9 @@
     "v1.2.1",
     "v1.2.2"
   ],
+  "fks-loadingscreen": [
+    "v1.0.0"
+  ],
   "fks-stables": [
     "v1.0.0",
     "v1.0.1",
