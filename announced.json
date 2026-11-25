@@ -1,5 +1,8 @@
 {
   "fks-animations": [],
+  "fks-banking": [
+    "v1.0.0"
+  ],
   "fks-character": [
     "v.1.0.0",
     "v1.1.0",
@@ -14,7 +17,8 @@
     "v1.1.0"
   ],
   "fks-companies": [
-    "v1.0.0"
+    "v1.0.0",
+    "v1.1.0"
   ],
   "fks-core": [
     "v1.0.0",
